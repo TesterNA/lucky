@@ -1,0 +1,30 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucky Percentage Calculator</title>
+</head>
+<body>
+    <h1>Lucky Percentage Calculator</h1>
+    <p>Enter your initial percentage chance:</p>
+    <input type="number" id="initialPercentage" min="0" max="100" step="0.01"> %
+    <button onclick="calculateLuckyPercentage()">Calculate</button>
+    <p id="result"></p>
+
+    <script>
+        function calculateLuckyPercentage() {
+            let initialPercentage = parseFloat(document.getElementById('initialPercentage').value);
+            if (isNaN(initialPercentage) || initialPercentage < 0 || initialPercentage > 100) {
+                alert('Please enter a valid percentage between 0 and 100.');
+                return;
+            }
+            let probability = initialPercentage / 100;
+            let luckyProbability = 1 - Math.pow(1 - probability, 2);
+            let luckyPercentage = luckyProbability * 100;
+            document.getElementById('result').innerText = 'Lucky Percentage: ' + luckyPercentage.toFixed(2) + '%';
+        }
+    </script>
+</body>
+</html>
