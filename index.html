@@ -1,30 +1,364 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lucky Percentage Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0f, #0f0f1a, #1a1a2e);
+            color: #e0e6ed;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            padding: 0;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            max-width: 450px;
+            width: 100%;
+            transition: transform 0.3s ease;
+            overflow: hidden;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+        }
+
+        h1 {
+            font-size: 2.2em;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 600;
+            text-align: center;
+            padding: 30px 30px 0 30px;
+        }
+
+        .tabs {
+            display: flex;
+            background: rgba(0, 0, 0, 0.3);
+            margin: 0 20px 20px 20px;
+            border-radius: 16px;
+            padding: 4px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px 16px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.9em;
+            color: #7a8895;
+        }
+
+        .tab.active {
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            color: white;
+            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+        }
+
+        .tab:hover:not(.active) {
+            color: #b8c5d1;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .tab-content {
+            padding: 0 40px 40px 40px;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+            color: #b8c5d1;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 1.1em;
+            border: 2px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            color: #e0e6ed;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input[type="number"]:focus {
+            border-color: #4facfe;
+            box-shadow: 0 0 20px rgba(79, 172, 254, 0.3);
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        input[type="number"]::placeholder {
+            color: #5a6570;
+        }
+
+        button {
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
+            width: 100%;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(79, 172, 254, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .result {
+            margin-top: 25px;
+            padding: 20px;
+            font-size: 1.3em;
+            font-weight: 600;
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(79, 172, 254, 0.2);
+            color: #4facfe;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .result.show {
+            opacity: 1;
+        }
+
+        .percentage-symbol {
+            color: #00f2fe;
+            font-weight: bold;
+        }
+
+        .explanation {
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #7a8895;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        /* Subtle animation for background */
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(-10px, -10px) rotate(-1deg); }
+            66% { transform: translate(10px, -5px) rotate(1deg); }
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(79, 172, 254, 0.03) 0%, transparent 70%);
+            animation: float 25s ease-in-out infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            position: relative;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 480px) {
+            .container {
+                margin: 10px;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+                padding: 20px 20px 0 20px;
+            }
+            
+            .tab-content {
+                padding: 0 25px 30px 25px;
+            }
+
+            .tabs {
+                margin: 0 15px 15px 15px;
+            }
+
+            .tab {
+                padding: 10px 12px;
+                font-size: 0.85em;
+            }
+            
+            input[type="number"], button {
+                padding: 12px 16px;
+                font-size: 1em;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Lucky Percentage Calculator</h1>
-    <p>Enter your initial percentage chance:</p>
-    <input type="number" id="initialPercentage" min="0" max="100" step="0.01"> %
-    <button onclick="calculateLuckyPercentage()">Calculate</button>
-    <p id="result"></p>
+    <div class="container">
+        <h1>Lucky Percentage Calculator</h1>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('normal')">Initial → Lucky</div>
+            <div class="tab" onclick="switchTab('reverse')">Lucky → Required</div>
+        </div>
+
+        <!-- Normal Tab -->
+        <div class="tab-content active" id="normal-tab">
+            <div class="input-group">
+                <label for="initialPercentage">Enter your initial percentage chance:</label>
+                <input type="number" id="initialPercentage" min="0" max="100" step="0.01" placeholder="0.00">
+            </div>
+            <button onclick="calculateLuckyPercentage()">Calculate Lucky %</button>
+            <div id="result1" class="result"></div>
+            <div class="explanation">
+                Calculate the lucky percentage when you have two attempts at the given initial chance.
+            </div>
+        </div>
+
+        <!-- Reverse Tab -->
+        <div class="tab-content" id="reverse-tab">
+            <div class="input-group">
+                <label for="luckyPercentage">Enter your desired lucky percentage:</label>
+                <input type="number" id="luckyPercentage" min="0" max="100" step="0.01" placeholder="0.00">
+            </div>
+            <button onclick="calculateRequiredPercentage()">Calculate Required %</button>
+            <div id="result2" class="result"></div>
+            <div class="explanation">
+                Calculate what initial percentage you need to achieve the desired lucky percentage.
+            </div>
+        </div>
+    </div>
 
     <script>
+        function switchTab(tab) {
+            // Remove active class from all tabs and contents
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+            
+            // Add active class to clicked tab and corresponding content
+            event.target.classList.add('active');
+            document.getElementById(tab + '-tab').classList.add('active');
+            
+            // Clear results
+            document.querySelectorAll('.result').forEach(r => r.classList.remove('show'));
+        }
+
         function calculateLuckyPercentage() {
             let initialPercentage = parseFloat(document.getElementById('initialPercentage').value);
+            const resultElement = document.getElementById('result1');
+            
             if (isNaN(initialPercentage) || initialPercentage < 0 || initialPercentage > 100) {
-                alert('Please enter a valid percentage between 0 and 100.');
+                showError(resultElement, '⚠️ Please enter a valid percentage between 0 and 100');
                 return;
             }
+            
             let probability = initialPercentage / 100;
             let luckyProbability = 1 - Math.pow(1 - probability, 2);
             let luckyPercentage = luckyProbability * 100;
-            document.getElementById('result').innerText = 'Lucky Percentage: ' + luckyPercentage.toFixed(2) + '%';
+            
+            showSuccess(resultElement, `🍀 Lucky Percentage: <span class="percentage-symbol">${luckyPercentage.toFixed(2)}%</span>`);
         }
+
+        function calculateRequiredPercentage() {
+            let luckyPercentage = parseFloat(document.getElementById('luckyPercentage').value);
+            const resultElement = document.getElementById('result2');
+            
+            if (isNaN(luckyPercentage) || luckyPercentage < 0 || luckyPercentage > 100) {
+                showError(resultElement, '⚠️ Please enter a valid percentage between 0 and 100');
+                return;
+            }
+            
+            let luckyProbability = luckyPercentage / 100;
+            
+            // Solve for initial probability: initial = 1 - sqrt(1 - lucky)
+            let initialProbability = 1 - Math.sqrt(1 - luckyProbability);
+            let initialPercentage = initialProbability * 100;
+            
+            showSuccess(resultElement, `🎯 Required Initial: <span class="percentage-symbol">${initialPercentage.toFixed(2)}%</span>`);
+        }
+
+        function showError(element, message) {
+            element.innerHTML = message;
+            element.style.background = 'rgba(255, 107, 107, 0.1)';
+            element.style.borderColor = 'rgba(255, 107, 107, 0.3)';
+            element.style.color = '#ff6b6b';
+            element.classList.add('show');
+        }
+
+        function showSuccess(element, message) {
+            element.innerHTML = message;
+            element.style.background = 'rgba(0, 0, 0, 0.2)';
+            element.style.borderColor = 'rgba(79, 172, 254, 0.2)';
+            element.style.color = '#4facfe';
+            element.classList.add('show');
+        }
+
+        // Allow Enter key to trigger calculation
+        document.getElementById('initialPercentage').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculateLuckyPercentage();
+            }
+        });
+
+        document.getElementById('luckyPercentage').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculateRequiredPercentage();
+            }
+        });
+
+        // Clear result when input changes
+        document.getElementById('initialPercentage').addEventListener('input', function() {
+            document.getElementById('result1').classList.remove('show');
+        });
+
+        document.getElementById('luckyPercentage').addEventListener('input', function() {
+            document.getElementById('result2').classList.remove('show');
+        });
     </script>
 </body>
 </html>
